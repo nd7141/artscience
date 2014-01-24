@@ -6,7 +6,7 @@ app.use(express.logger());
 
 var htmlFile = './public/index.html';
 
-app.use(express.static(__dirname + '/public'));
+app.use(express.static(__dirname+'/public'));
 
 app.get('/', function(req,res){
 	var html = fs.readFileSync(htmlFile).toString();
