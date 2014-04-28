@@ -1,405 +1,818 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <link rel="shortcut icon" href="assets/ico/favicon.png">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <script src="//vk.com/js/api/xd_connection.js?2" type="text/javascript"></script>
+  <script src="//vk.com/js/api/openapi.js" type="text/javascript"></script>
+  <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
+  <title>Дерево репостов</title>
+  <style>
+    body {
+      background-color: #fff;
+      overflow-x: hidden;
+    }
+    body, select {
+      font-family: Lucida Grande, Arial, tahoma, verdana, sans-serif; font-size: 12px;
+    }
+    a {
+      text-decoration: none;
+    }
+    a:hover, a:active {
+      text-decoration: underline;
+    }
+    .clear_fix:after {
+      content: '.';
+      display: block;
+      height: 0;
+      clear: both;
+      visibility: hidden;
+    }
+    * html .clear_fix {
+      height: 1%;
+    }
+    .clear_fix {
+      display: block;
+    }
+    .button_blue,
+    .button_gray {
+      text-align: center;
+      -webkit-border-radius: 2px;
+      -khtml-border-radius: 2px;
+      -moz-border-radius: 2px;
+      border-radius: 2px;
+      display: inline-block;
+      *display: inline;
+      position: relative;
+      line-height: normal;
+      zoom: 1;
+    }
+    .box_controls .button_blue,
+    .box_controls .button_gray {
+      margin: 2px 5px;
+    }
+    .button_blue button,
+    .button_gray button {
+      border: 1px solid;
+      background: none;
+      font-size: 11px;
+      margin: 0px;
+      cursor: pointer;
+      white-space: nowrap;
+      outline: none;
+      padding: 4px 14px;
+      *padding: 5px 15px 3px;
+      font-family: tahoma, arial, verdana, sans-serif, Lucida Sans;
+      vertical-align: top;
+      overflow: visible;
+    }
+    .button_blue {
+      border: 1px solid #4e6f93;
+      border-top-color: #517295;
+      background: #5D81A7;
+    }
+    .button_blue button {
+      border-top-color: #789ABF;
+      border-bottom-color: #5980A9;
+      border-left-color: #5980A9;
+      border-right-color: #5980A9;
+      color: #FFF;
+      text-shadow:0 1px 0 #45688E;
+      *border: 0;
+      background: url(/images/button_vk.png) #6181a6 repeat-x top;
+      background-position: 0px -16px;
+      *background-position: 0px -16px;
+    }
+    .button_blue button:hover,
+    .button_blue button.hover {
+      background-position: 0px -8px;
+    }
+    .button_blue button:active,
+    .button_blue button.active {
+      background: #5e80a5;
+      border: 1px solid #5e80a5;
+      position:relative;
+    }
 
-    <title>Kelvin - Bootstrap 3 Resume Theme</title>
+    .post {
+      position: relative;
+      margin: 8px 0;
+    }
+    .post_image {
+      position: absolute;
+      top: 2px;
+    }
+    .post_author {
+      display: block;
+      font-weight: bold;
+    }
+    .post_body {
+      margin-left: 58px;
+      min-height: 52px;
+    }
+    .post_time {
+      color: #999;
+      display: block;
+    }
+    .post_stats {
+      float: right;
+      padding-left: 16px;
+      height: 10px;
+      color: #829BAF;
+      font-weight: bold;
+    }
+    .post_attachments img {
+      margin-right: 6px;
+    }
 
-    <!-- Bootstrap core CSS -->
-    <link href="assets/css/bootstrap.css" rel="stylesheet">
+    #post {
+      background: #fdfdfd;
+      border: 1px solid #eee;
+      border-radius: 4px;
+      box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.15);
+      padding: 8px;
+    }
+    #post .wrap {
+      margin-left: 58px;
+      line-height: 18px;
+    }
+    #post .photo {
+      position: absolute;
+    }
+    #progress {
+      display: none;
+      width: 100%;
+      height: 22px;
+    }
+    #progress .bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 22px;
+      background: url(pbar-ani.gif);
+      color: #fff;
+      text-align: center;
+      font-weight: bold;
+      z-index: 1000;
+    }
+  </style>
+</head>
+<body>
+  <div id="progress"><div class="bar">Hold on a sec</div></div>
+  <div id="inputs" style="margin: 150px auto; width: 741px;">
+    <p>Give me a reason:</p>
+    <input id="address" type="text" style="width: 623px; margin: 0 10px 8px 0;" value="https://vk.com/wall13085750_3201"/>
+    <br/>
+    <button onclick="location.href='posts.html'">
+     Graph it</button>
+    <!--button class="btn btn-primary" style="vertical-align: -1px; width: 90px" onclick="start();">Начать</button--><label style="display: inline; font-size: 12px;"><input type="checkbox" id="sexColor" style="margin: 0 6px">Gender colors</label>
+  </div>
+  <div id="results" style="position: relative">
 
-    <!-- Custom styles for this template -->
-    <link href="assets/css/main.css" rel="stylesheet">
-    
-	<link rel="stylesheet" href="assets/css/font-awesome.min.css">
-    
-    <link href='http://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic' rel='stylesheet' type='text/css'>
-    <link href='http://fonts.googleapis.com/css?family=Raleway:400,300,700' rel='stylesheet' type='text/css'>
-    
-    <script src="assets/js/jquery.min.js"></script>
-    <script type="text/javascript" src="assets/js/smoothscroll.js"></script> 
-    <script src="assets/js/Chart.js"></script>
+  </div>
 
-    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!--[if lt IE 9]>
-      <script src="assets/js/html5shiv.js"></script>
-      <script src="assets/js/respond.min.js"></script>
-    <![endif]-->
-  </head>
+<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" />
+<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-theme.min.css" />
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
 
-  <body data-spy="scroll" data-offset="0" data-target="#nav">
+<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 
-	<div id="section-topbar">
-		<div id="topbar-inner">
-			<div class="container">
-				<div class="row">
-					<div class="dropdown">
-						<ul id="nav" class="nav">
-							<li class="menu-item"><a class="smoothScroll" href="#about" title="About"><i class="icon-user"></i></a></li>
-							<li class="menu-item"><a class="smoothScroll" href="#resume" title="Resume"><i class="icon-file"></i></a></li>
-							<li class="menu-item"><a class="smoothScroll" href="#work" title="Works"><i class="icon-briefcase"></i></a></li>
-							<li class="menu-item"><a class="smoothScroll" href="#contact" title="Contact"><i class="icon-envelope"></i></a></li>
-						</ul><!--/ uL#nav -->
-					</div><!-- /.dropdown -->
+<script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
 
-					<div class="clear"></div>
-				</div><!--/.row -->
-			</div><!--/.container -->
+<script>
+  function ge(e) {return document.getElementById(e)};
+  function updateHeight() {
+    if (parent && parent != window) {
+      VK.callMethod("resizeWindow", 607, document.getElementsByTagName("body")[0].clientHeight + 20);
+    }
+  }
+  function num(n,cs) {
+    n = n % 100;
+    if ((n % 10 == 0) || (n % 10 > 4) || (n > 4 && n < 21)) {
+      return cs[2];
+    } else
+    if (n % 10 == 1) {
+      return cs[0];
+    } else {
+      return cs[1];
+    }
+  }
+  var month = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
 
-			<div class="clear"></div>
-		</div><!--/ #topbar-inner -->
-	</div><!--/ #section-topbar -->
-	
-	<div id="headerwrap">
-		<div class="container">
-			<div class="row centered">
-				<div class="col-lg-12">
-					<h1>William T. Kelvin</h1>
-					<h3>Web Designer | kelvin@blacktie.co</h3>
-				</div><!--/.col-lg-12 -->
-			</div><!--/.row -->
-		</div><!--/.container -->
-	</div><!--/.#headerwrap -->
-	
+  // Small VK API extension for automatic schedule & batch requests
+  var apiMinRequestTime;
+  var apiMinRequestInterval = 340; // CONST, 1/3 sec
+  var apiQueue = [];
+  var apiMaxQueueSize = 25; // 25 requests
 
-	<section id="about" name="about"></section>
-	<div id="intro">
-		<div class="container">
-			<div class="row">
-				
-				<div class="col-lg-2 col-lg-offset-1">
-					<h5>ABOUT</h5>
-				</div>
-				<div class="col-lg-6">
-					<p>I'm web designer & front-end developer with 7 years of professional experience. I'm interested in all kinds of visual communication, but my major focus is on designing web, mobile & tablet interfaces. I also have skills in other fields like branding, icon design or web development.</p>
-				</div>
-				<div class="col-lg-3">
-					<p><a href="#"><i class="icon-file"></i></a> <sm>DOWNLOAD PDF</sm></p>
-				</div>
-				
-			</div><!--/.row -->
-		</div><!--/.container -->
-	</div><!--/ #intro -->
+  /**
+   * Ensures that VK API requests will be performed at the fixed rate (apiMinRequestInterval milliseconds between), also allows to place requests in queue for later batch execution (via execute)
+   * @param  {String}   method          Name of the method
+   * @param  {Object}   params          Key-value pairs of params
+   * @param  {Function} callback        Callback
+   * @param  {Boolean}  enqueue         If true, does not perform this request right now, places it to the apiQueue instead (make sure that execute will be called later)
+   * @return {Array|Number|undefined}   Returns apiQueue if enqueue = true, id of timeout if it will be called later, or undefined if it was successfully called right now
+   */
+  function api(method, params, callback, enqueue) {
+    if (enqueue) {
+      apiQueue.push({ method: method, params: params, callback: callback });
+      return apiQueue;
+    }
 
+    var now = (new Date()).getTime();
+    var result;
+    if (!apiMinRequestTime || now >= apiMinRequestTime) {
+      VK.api(method, params, callback);
+      apiMinRequestTime = now + apiMinRequestInterval;
+    } else {
+      result = setTimeout(function() {
+        api(method, params, callback);
+    //apiMinRequestTime = now + apiMinRequestInterval;
+      }, apiMinRequestTime - now);
+    }
+    return result;
+  }
 
-	<section id="resume" name="resume"></section>
-	<!--EDUCATION DESCRIPTION -->
-	<div class="container desc">
-		<div class="row">
+  /**
+   * Performs queued API calls
+   * @param  {Boolean}  single   Process only first apiMaxQueueSize instead of full queue
+   * @param  {Array}    queue    Array of calls. If unspecified, takes calls from apiQueue
+   * @param  {Function} callback Global callback, will be called only when all calls returned data (even if they were broken into several requests),
+   *                             should accept array of responses as its only parameter
+   * @return {Array}             Returns updated queue (empty if single = false, or with first apiMaxQueueSize elements removed)
+   */
+  function execute(single, queue, callback) {
+    queue = queue || apiQueue;
+    var offset = 0;
+    if (!single && callback) {
+      var total = queue.length;
+      var results = new Array(total);
+    }
+    do {
+      var calls = queue.splice(0, apiMaxQueueSize);
+      if (calls.length > 0) {
+        var arr = [];
+        for (var i = 0; i < calls.length; i++) {
+          arr.push('API.' + calls[i].method + '(' + JSON.stringify(calls[i].params) + ')');
+        }
 
-				<div class="col-lg-2 col-lg-offset-1">
-					<h5>EDUCATION</h5>
-				</div>
-				<div class="col-lg-6">
-					<p><t>Master of Web Design</t><br/>
-						St. Patrick University <br/>
-						<i>3 Years Course</i>
-					</p>
-				</div>
-				<div class="col-lg-3">
-					<p><sm>GRADUATING IN MAY 2014</sm><br/>
-					<imp><sm>IN PROGRESS</sm></imp>
-					</p>
-				</div>
-	
-				<div class="col-lg-6 col-lg-offset-3">
-					<p><t>Degree of Web Developer</t><br/>
-						Hastings University <br/>
-						<i>2 Years Course</i>
-					</p>
-				</div>
-				<div class="col-lg-3">
-					<p><sm>JUNE 2012</sm></p>
-				</div>
-	
-		</div><!--/.row -->
-		<br>
-		<hr>
-	</div><!--/.container -->
-	
-	
-	<!--WORK DESCRIPTION -->
-	<div class="container desc">
-		<div class="row">
+        (function(calls, offset) {
+          api('execute', { code: 'return [' + arr.join(',') + '];', v: '5.2' }, function(data) {
+            if (!data.response) {
+              console.log(data);
+            }
+            if (data.response) {
+              for (var i = 0; i < calls.length; i++) {
+                calls[i].callback && calls[i].callback({ response: data.response[i] });
+              }
+            } else {
+              for (var i = 0; i < calls.length; i++) {
+                calls[i].callback && calls[i].callback(data);
+              }
+            }
 
-				<div class="col-lg-2 col-lg-offset-1">
-					<h5>WORK</h5>
-				</div>
-				<div class="col-lg-6">
-					<p><t>Front-end Developer</t><br/>
-						Black Tie Corp. <br/>
-					</p>
-					<p><more>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</more></p>
-				</div>
-				<div class="col-lg-3">
-					<p><sm>AUGUST 2012 - CURRENT</sm></p>
-				</div>
-	
-				<div class="col-lg-6 col-lg-offset-3">
-					<p><t>Web Designer - Intern</t><br/>
-						Onassis Ltd. <br/>
-					</p>
-					<p><more>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</more></p>
-				</div>
-				<div class="col-lg-3">
-					<p><sm>JUNE 2010 - JULY 2012</sm></p>
-				</div>
-		</div><!--/.row -->
-		<br>
-		<hr>
-	</div><!--/.container -->
+            if (!single && callback) {
+              for (var i = 0; i < calls.length; i++) {
+                results[offset + i] = data.response[i];
+              }
+              total -= calls.length;
+              if (total <= 0) {
+                callback(results);
+              }
+            } else {
+              callback && callback(data);
+            }
+          });
+        })(calls, offset);
+      }
+      offset += calls.length;
+    } while (!single && queue.length > 0);
+    return queue;
+  }
 
+  var authorized = false;
+  if (parent && parent != window) {
+    VK.init(function() {
+      VK.loadParams(document.location.href);
+      //me = JSON.parse(VK.params.api_result).response[0];
+    });
+    authorized = true;
+  } else {
+    VK.init({
+      apiId: 3915325
+    });
+  }
 
-	<!--AWARDS DESCRIPTION -->
-	<div class="container desc">
-		<div class="row">
-				<div class="col-lg-2 col-lg-offset-1">
-					<h5>AWARDS</h5>
-				</div>
-				<div class="col-lg-6">
-					<p><t>Best Web Design</t><br/>
-						Black Tie Site <br/>
-					</p>
-				</div>
-				<div class="col-lg-3">
-					<p><sm>NOVEMBER 2013</sm></p>
-				</div>
-	
-				<div class="col-lg-6 col-lg-offset-3">
-					<p><t>Designer of the Year</t><br/>
-						Awwwards Site
-					</p>
-					<p><more>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</more></p>
-				</div>
-				<div class="col-lg-3">
-					<p><sm>2013</sm></p>
-				</div>
-		
-		</div><!--/.row -->
-		<br>
-	</div><!--/.container -->
-	
-	
-	<!--SKILLS DESCRIPTION -->
-	<div id="skillswrap">
-		<div class="container">
-			<div class="row">
-					<div class="col-lg-2 col-lg-offset-1">
-						<h5>SKILLS</h5>
-					</div>
-					<div class="col-lg-3 centered">
-						<canvas id="javascript" height="130" width="130"></canvas>
-						<p>Javascript</p>
-						<br>
-						<script>
-							var doughnutData = [
-									{
-										value: 70,
-										color:"#1abc9c"
-									},
-									{
-										value : 30,
-										color : "#ecf0f1"
-									}
-								];
-								var myDoughnut = new Chart(document.getElementById("javascript").getContext("2d")).Doughnut(doughnutData);
-						</script>
-					</div>
-					<div class="col-lg-3 centered">
-						<canvas id="bootstrap" height="130" width="130"></canvas>
-						<p>Bootstrap</p>
-						<br>
-						<script>
-							var doughnutData = [
-									{
-										value: 90,
-										color:"#1abc9c"
-									},
-									{
-										value : 10,
-										color : "#ecf0f1"
-									}
-								];
-								var myDoughnut = new Chart(document.getElementById("bootstrap").getContext("2d")).Doughnut(doughnutData);
-						</script>
-					</div>
-					<div class="col-lg-3 centered">
-						<canvas id="wordpress" height="130" width="130"></canvas>
-						<p>Wordpress</p>
-						<br>
-						<script>
-							var doughnutData = [
-									{
-										value: 65,
-										color:"#1abc9c"
-									},
-									{
-										value : 35,
-										color : "#ecf0f1"
-									}
-								];
-								var myDoughnut = new Chart(document.getElementById("wordpress").getContext("2d")).Doughnut(doughnutData);
-						</script>
-					</div>
-					
-					<div class="col-lg-3 col-lg-offset-3 centered">
-						<canvas id="html" height="130" width="130"></canvas>
-						<p>HTML/CSS</p>
-						<br>
-						<script>
-							var doughnutData = [
-									{
-										value: 80,
-										color:"#1abc9c"
-									},
-									{
-										value : 20,
-										color : "#ecf0f1"
-									}
-								];
-								var myDoughnut = new Chart(document.getElementById("html").getContext("2d")).Doughnut(doughnutData);
-						</script>
-					</div>
-					<div class="col-lg-3 centered">
-						<canvas id="photoshop" height="130" width="130"></canvas>
-						<p>Photoshop</p>
-						<br>
-						<script>
-							var doughnutData = [
-									{
-										value: 70,
-										color:"#1abc9c"
-									},
-									{
-										value : 30,
-										color : "#ecf0f1"
-									}
-								];
-								var myDoughnut = new Chart(document.getElementById("photoshop").getContext("2d")).Doughnut(doughnutData);
-						</script>
-					</div>
-					<div class="col-lg-3 centered">
-						<canvas id="illustrator" height="130" width="130"></canvas>
-						<p>Illustrator</p>
-						<br>
-						<script>
-							var doughnutData = [
-									{
-										value: 50,
-										color:"#1abc9c"
-									},
-									{
-										value : 50,
-										color : "#ecf0f1"
-									}
-								];
-								var myDoughnut = new Chart(document.getElementById("illustrator").getContext("2d")).Doughnut(doughnutData);
-						</script>
-					</div>
+  var total = [0];
+  var max = [1];
+  var all = 0;
+  var cache = {};
+  var deepest;
+  var postponed = [];
+  var tree = [[]];
+  var left = 0;
+  var drawTimer;
+  var rseed;
+  var profiles = {};
+  var groups = {};
+  var full = {};
+  var fixed = {};
+  var unique = 0;
+  var used = {};
+  var oldest = false;
+  var newest = false;
+  function addStats(node) {
+    total[node.level] = (total[node.level]|0) + 1;
+    all++;
+    if (!used[node.post.to_id]) {
+      used[node.post.to_id] = true;
+      unique++;
+    }
 
-			</div><!--/.row -->
-			<br>
-		</div><!--/.container -->
-	</div><!--/ #skillswrap -->
+    if (!oldest || node.post.date < oldest.post.date) {
+      oldest = node;
+    }
+    if (!newest || node.post.date > newest.post.date) {
+      newest = node;
+    }
+  }
+  function addReposts(owner_id, post_id, reposts, _profiles, _groups, level, tree) {
+    for (var i = 0; i < _profiles.length; i++) {
+      profiles[_profiles[i].id] = _profiles[i];
+    }
+    for (var i = 0; i < _groups.length; i++) {
+      groups[_groups[i].id] = _groups[i];
+    }
+    var count = 0;
+    for (var i = 0; i < reposts.length; i++) {
+      // add repost
+      // ...
+
+      (function(repost) {
+        var from_history = false;
+        if (repost.copy_history) {
+          for (var j = -1; j < repost.copy_history.length - 1; j++) {
+            if (repost.copy_history[j + 1].id == post_id && repost.copy_history[j + 1].owner_id == owner_id) {
+              if (j > -1) {
+                repost = repost.copy_history[j];
+                repost.to_id = repost.owner_id;
+                repost.reposts = { count: 1 };
+              }
+              from_history = true;
+              break;
+            }
+          }
+        }
+
+        if (!total[level + 1]) {
+          deepest = repost;
+        }
+
+        if (cache[repost.to_id + '_' + repost.id]) {
+          return;
+        }
+
+        if (!from_history) {
+          //console.log('post ' + repost.id + '_' + repost.to_id + ' is not a child of post ' + post_id + '_' + owner_id + ', something wrong');
+
+          postponed.push({child: repost, post_id: post_id, owner_id: owner_id});
+          return;
+        }
 
 
+        var subtree = [];
+        cache[repost.to_id + '_' + repost.id] = {id: repost.to_id + '_' + repost.id, post: repost, level: level, parent: owner_id + '_' + post_id, childs: subtree };
+        tree.push(cache[repost.to_id + '_' + repost.id]);
+        addStats(cache[repost.to_id + '_' + repost.id]);
+        count++;
 
-	<section id="work" name="work"></section>
-	<!--PORTFOLIO DESCRIPTION -->
-	<div class="container desc">
-		<div class="row">
-				<div class="col-lg-2 col-lg-offset-1">
-					<h5>PORTFOLIO</h5>
-				</div>
-				<div class="col-lg-6">
-					<p><img class="img-responsive" src="assets/img/port01.jpg" alt=""></p>
-				</div>
-				<div class="col-lg-3">
-					<p>CANALS OF ENGLAND</p>
-				<p><more>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.<br/><br/>
-					<sm><i class="icon-tag"></i> design</sm></more> 
-				</p>
-				</div>
-	
-				<div class="col-lg-6 col-lg-offset-3">
-					<p><img class="img-responsive" src="assets/img/port02.jpg" alt=""></p>
-				</div>
-				<div class="col-lg-3">
-						<p>SANKEY</p>
-					<p><more>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.<br/><br/>
-						<sm><i class="icon-tag"></i> front-end</sm></more> 
-					</p>
-				</div>
-				
-				<div class="col-lg-6 col-lg-offset-3">
-					<p><img class="img-responsive" src="assets/img/port03.jpg" alt=""></p>
-				</div>
-				<div class="col-lg-3">
-						<p>WE GROW</p>
-					<p><more>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.<br/><br/>
-						<sm><i class="icon-tag"></i> web design</sm></more> 
-					</p>
-				</div>
-		
-		</div><!--/.row -->
-		<br>
-		<br>
-	</div><!--/.container -->
-	
+        if (repost.reposts.count > 0) {
+          for (var offset = 0; offset < repost.reposts.count; offset += 1000) {
+            left++;
+            api('wall.getReposts', { owner_id: repost.to_id, post_id: repost.id, offset: offset, count: 1000, v: '5.2' }, function(data) {
+              if (!data.response) {
+                console.log(data);
+              }
+              left--;
+              addReposts(repost.to_id, repost.id, data.response.items, data.response.profiles, data.response.groups, level + 1, subtree);
+            }, true);
+          }
+        }
+      })(reposts[i]);
+    }
+
+    max[level] = Math.max(max[level]|0, count);
+    if (apiQueue >= apiMaxQueueSize) {
+      execute();
+    }
+    //console.log('level ' + level + ': ' + total[level] + ', all: ' + all);
+
+    if (left == 0) {
+      ge('progress').style.display = 'none';
+      clearInterval(drawTimer);
+      draw(rseed|0);
+    }
+  }
+
+  setInterval(execute, 1000);
+
+  function fixPostponed() {
+    for (var i = 0; i < postponed.length; i++) {
+      var child = postponed[i].child;
+      if (!cache[child.to_id + '_' + child.id]) {
+        (function(child) {
+          api('wall.getById', { posts: child.to_id + '_' + child.id, extended: 1, copy_history_depth: 1000, v: '5.2' }, function(data) {
+            console.log('checking history of post ' + child.to_id + '_' + child.id);
+            var repost = data.response.items[0];
+            if (!repost) return;
+
+            for (var j = 0; j < repost.copy_history.length - 1; j++) {
+              var next = cache[repost.copy_history[j + 1].owner_id + '_' + repost.copy_history[j + 1].id];
+              if (next) {
+                var parent = repost.copy_history[j];
+                console.log('found parent ' + parent.owner_id + '_' + parent.id);
+                api('wall.getReposts', { owner_id: parent.owner_id, post_id: parent.id, offset: 0, count: 1000, v: '5.2' }, function(data) {
+                  if (!data.response) {
+                    console.log(data);
+                  }
+                  addReposts(parent.owner_id, parent.id, data.response.items, data.response.profiles, data.response.groups, next.level + 1);
+                }, true);
+                break;
+              }
+            }
+          }, true);
+        })(child);
+      }
+    }
+    postponed = [];
+    execute();
+  };
+
+  var current = false;
+  var month = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+
+  var isFriend = {};
+
+  var sexColor;
+  function start(skipAuth) {
+    sexColor = ge('sexColor').checked;
+    if (!authorized && !skipAuth) {
+      VK.Auth.login(function(response) {
+        authorized = response.session;
+        isFriend[authorized.mid] = true;
+        start();
+      }, 8192 + 2);
+      return;
+    }
+
+    var address = ge('address').value;
+    var match = address.match(/wall(-?\d+)_(\d+)/);
+    if (!match) {
+      alert('Некорректная ссылка. Введите ссылку на исходный пост в формате wall111_222');
+      return;
+    }
+    var owner_id = match[1];
+    var post_id = match[2];
+    api('execute', { code: 'return { "post": API.wall.getById({ "posts": "' + owner_id + '_' + post_id + '", "extended": 1, "v": "5.2" }).items[0], "reposts": API.wall.getReposts({ "owner_id": ' + owner_id + ', "post_id": ' + post_id + ', "count": 1000, "v": "5.2" }), "friends": API.friends.get({ "v": "5.2" }).items };', v: '5.2' }, function(data) {
+      console.log(data);
+      // add source post
+      ///...
+      var post = data.response.post;
+      tree = cache[owner_id + '_' + post_id] = {id: owner_id + '_' + post_id, post: post, level: 0, parent: false, childs: [] };
+      addStats(tree);
+
+      var friends = data.response.friends || [];
+      for (var i = 0; i < friends.length; i++) {
+        isFriend[friends[i]] = true;
+      }
+      addReposts(owner_id, post_id, data.response.reposts.items, data.response.reposts.profiles, data.response.reposts.groups, 1, tree.childs);
+    });
+
+    //ge('results').innerHTML = '<h4>Подождите...</h4>';
+    ge('inputs').style.display = 'none';
+    ge('results').innerHTML = '<canvas id="canvas" width="1" height="1" style="margin: 3px; background: #fff"></canvas><canvas id="highlight" width="1" height="1" style="margin: 3px; position: absolute; left: 0; top: 0"></canvas><div id="post" style="position: absolute; left: 0; top: 0; display: none"></div>';
+    ge('highlight').onmousemove = function(e) {
+      var x = e.offsetX || e.layerX || 0;
+      var y = e.offsetY || e.layerY || 0;
+      if (chunks[x >>> 8] && chunks[x >>> 8][y >>> 8]) {
+        var chunk = chunks[x >>> 8][y >>> 8];
+        var mindist = 1000;
+        var nearest = false;
+        for (var i = 0; i < chunk.length; i++) {
+          var dist = (chunk[i].x - x) * (chunk[i].x - x) + (chunk[i].y - y) * (chunk[i].y - y);
+          if (dist < mindist) {
+            mindist = dist;
+            nearest = chunk[i];
+          }
+        }
+
+        if (nearest && mindist < 100) {
+          var w = 500, h = 50;
+          x = nearest.x;
+          y = nearest.y;
 
 
-	<section id="contact" name="contact"></section>
-	<!--FOOTER DESCRIPTION -->
-	<div id="footwrap">
-		<div class="container">
-			<div class="row">
-			
-				<div class="col-lg-2 col-lg-offset-1">
-					<h5>CONTACT</h5>
-				</div>
-				<div class="col-lg-6">
-					<p><t>Email</t><br/>
-						william@blacktie.co <br/>
-					</p>
-					<p><t>Adress</t><br/>
-						Some Ave. 987 <br/>
-						Postal 23892 <br/>
-						London, England. <br/>
-					</p>
-					<p><t>Phone</t><br/>
-						+55 8933-2383 <br/>
-					</p>
-				</div>
-				<div class="col-lg-3">
-					<p><sm>SOCIAL LINKS</sm></p>
-					<p>
-						<a href="#"><i class="icon-dribbble"></i></a>
-						<a href="#"><i class="icon-twitter"></i></a>
-						<a href="#"><i class="icon-facebook"></i></a>
-						<a href="#"><i class="icon-linkedin"></i></a>
-						<a href="#"><i class="icon-apple"></i></a>
+          var left = x > window.innerWidth - w;
+          var top = y > document.height - 100;
 
-					</p>
-				</div>
-			</div><!--/.row -->
-		</div><!--/.container -->
-	</div><!--/ #footer -->
-	
-	<div id="c">
-		<div class="container">
-			<p>Created by <a href="http://www.blacktie.co">BLACKTIE.CO</a></p>
-		
-		</div>
-	</div>
-	
+          ge('post').style.display = 'block';
+          ge('post').style.left = (left ? (x - w - 20) : (x + 4)) + 'px';
+          ge('post').style.top = (top ? (y - h - 20) : (y + 4)) + 'px';
+          ge('post').style.width = w + 'px';
+          ge('post').style.minHeight = h + 'px';
 
-    <!-- Bootstrap core JavaScript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
-    <script src="assets/js/bootstrap.js"></script>
-  </body>
+          showPost(nearest);
+          drawHighlight(nearest);
+        } else {
+          ge('post').style.display = 'none';
+          drawHighlight(true);
+          current = false;
+        }
+      }
+    }
+    ge('highlight').onclick = function(e) {
+      if (current) {
+        fixed[current] = !fixed[current];
+      }
+    }
+    ge('highlight').onmouseout = function(e) {
+      //ge('post').style.display = 'none';
+    }
+    ge('progress').style.display = 'block';
+    updateHeight();
+
+    rseed = Math.random() * 0x80000000;
+    drawTimer = setInterval(function() {
+      draw(rseed|0);
+    }, 2000);
+  }
+
+  function drawHighlight(e) {
+    var width = ge('canvas').width;
+    var height = ge('canvas').height;
+    ge('highlight').width = width;
+    ge('highlight').height = height;
+    var ctx = ge('highlight').getContext('2d');
+    ctx.clearRect(0, 0, width, height);
+
+    for (var f in fixed) {
+      if (fixed[f]) {
+        drawLine(cache[f]);
+      }
+    }
+
+    if (!e) {
+      return;
+    }
+
+    drawLine(e);
+  }
+
+  function drawLine(e) {
+    var ctx = ge('highlight').getContext('2d');
+    while (e.parent) {
+      var grad = ctx.createLinearGradient(cache[e.parent].x, cache[e.parent].y, e.x, e.y);
+      grad.addColorStop(0, HSVtoRGB(cache[e.parent].color).toString());
+      grad.addColorStop(1, HSVtoRGB(e.color).toString());
+      //ctx.strokeStyle = grad;
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 5;
+      ctx.beginPath();
+      ctx.moveTo(cache[e.parent].x, cache[e.parent].y);
+      //ctx.lineTo(targ[0], targ[1]);
+      ctx.bezierCurveTo(cache[e.parent].x, cache[e.parent].y + levelHeight(e.level) * 0.4, e.x, e.y - levelHeight(e.level) * 0.4, e.x, e.y);
+      ctx.stroke();
+
+      ctx.strokeStyle = '#f00';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(cache[e.parent].x, cache[e.parent].y);
+      //ctx.lineTo(targ[0], targ[1]);
+      ctx.bezierCurveTo(cache[e.parent].x, cache[e.parent].y + levelHeight(e.level) * 0.4, e.x, e.y - levelHeight(e.level) * 0.4, e.x, e.y);
+      ctx.stroke();
+
+      e = cache[e.parent];
+    }
+  }
+
+  function showPost(e) {
+    if (current != e.id) {
+      var post = e.post;
+      var details = full[e.id];
+      if (details === undefined) {
+        /*full[e.id] = false;
+        api('wall.getById', { posts: e.id }, function(data) {
+          full[e.id] = data.response[0];
+          if (current == e.id) {
+            showPost(e);
+          }
+        }, true);*/
+      }
+      var time = new Date(post.date * 1000);
+      var isUser = post.from_id > 0;
+      var author = (isUser ? profiles : groups)[Math.abs(post.from_id)];
+
+      console.log(post, author);
+
+      ge('post').innerHTML = '<img class="photo" src="' + (author.photo || author.photo_50) + '"/>' +
+        '<div class="wrap"><a class="author" href="//vk.com/' + (isUser ? 'id' : 'club') + author.id + '" target="_blank">' + (isUser ? author.first_name + ' ' + author.last_name : author.name) + '</a>' +
+        '<div class="comment">' + post.text + '</div>' +
+        '<div class="post_stats"><i style="float: left; margin-top: 4px; margin-right: 5px; width: 11px; height: 11px; background: url(//vk.com/images/icons/like.gif) no-repeat 0 -21px;"></i>' + e.childs.length + '</div>' +
+
+        (details ?
+        '<div class="post_stats"><i style="float: left; margin-top: 5px; margin-right: 5px; width: 11px; height: 10px; background: url(//vk.com/images/icons/like.gif) no-repeat 1px 0;"></i>' + details.likes.count + '</div>' +
+        '<div class="post_stats"><i style="float: left; margin-top: 3px; margin-right: 5px; width: 11px; height: 12px; background: url(//vk.com/images/icons/mono_iconset.gif) no-repeat 0 -192px;"></i>' + details.comments.count + '</div>'
+         : '') +
+
+        '<a href="//vk.com/wall' + post.to_id + '_' + post.id + '" target="_blank" class="post_time">' + time.getDate() + ' ' + month[time.getMonth()] + ' ' + time.getFullYear() + ' в ' + time.getHours() + ':' + (time.getMinutes() < 10 ? '0' : '') + time.getMinutes() + '</a></div>';
+
+      current = e.id;
+    }
+  }
+
+  function levelHeight(level) {
+    //return 10 + Math.log(total[level]) * Math.log(total[level] * Math.log(total[level]) + 1);
+
+    return (10 + Math.log(max[level]) * Math.log(max[level]) * 3) * hmult;
+  }
+  var chunks = [];
+  var hmult = 1;
+  function draw(seed) {
+    var width = window.innerWidth - 16;
+    ge('canvas').width = width;
+
+
+    var height = 10;
+    hmult = 1;
+    for (var i = 1; i < total.length; i++) {
+      height += levelHeight(i);
+    }
+    hmult = Math.max(800 / height, 1);
+    height *= hmult;
+
+    ge('canvas').height = height;
+    var ctx = ge('canvas').getContext('2d');
+
+    ctx.clearRect(0, 0, width, height);
+    var offset = [];
+    var levelDrawn = {};
+    var sub = function(parent, level, hsv, source) {
+      var rng = new RNG(seed * (level + 13));
+      var x = ((offset[level]|0) + 1) * ((width - 8) / (total[level] + 1)) + 8;
+      if (source) {
+        var diff = ((width - 8) / (total[level] + 1));
+        var m = 20 / diff;
+        x = (x * m + source[0]) / (m + 1);
+      }
+      var y = source ? (source[1] + levelHeight(level)) : 5;
+      parent.x = x;
+      parent.y = y;
+      parent.color = hsv;
+      if (!chunks[x >>> 8]) {
+        chunks[x >>> 8] = [];
+      }
+      if (!chunks[x >>> 8][y >>> 8]) {
+        chunks[x >>> 8][y >>> 8] = [];
+      }
+      chunks[x >>> 8][y >>> 8].push(parent);
+
+      for (var i = 0; i < parent.childs.length; i++) {
+        var color = { h: hsv.h + (parent.childs.length > 1 ? (rng.nextFloat() * 0.3 - 0.15) : 0), s: hsv.s + rng.nextFloat() * 0.4 - 0.2, v: hsv.v + 0.3 - 0.6 * (i / parent.childs.length) + rng.nextFloat() * 0.2 - 0.1 };
+        while (color.h < 0) color.h += 1;
+        while (color.h > 1) color.h -= 1;
+        while (color.v < 0.3) color.v = 0.3;
+        while (color.v > 0.85) color.v = 0.85;
+        while (color.s < 0.5) color.s = 0.5;
+        while (color.s > 0.85) color.s = 0.85;
+
+        if (sexColor) {
+          // experimental
+          if (!profiles[parent.childs[i].post.from_id]) {
+            console.log(parent.childs[i].post);
+          }
+          if (parent.childs[i].post.from_id < 0) { // group
+            //color.h = (3 / 12) + color.h * (1 / 6);
+            color.h = 0.4;
+            color.v = 0.8;
+            color.s = 0.85;
+          } else
+          if (profiles[parent.childs[i].post.from_id] && profiles[parent.childs[i].post.from_id].sex == 1) { // girl
+            //color.h = (11 / 12) + color.h * (1 / 6);
+            //while (color.h > 1) color.h -= 1;
+            color.h = 0.05;
+            color.v = 0.9;
+            color.s = 0.85;
+          } else {
+            //color.h = (7 / 12) + color.h * (1 / 6);
+            color.h = 0.6;
+            color.v = 0.9;
+            color.s = 0.9;
+          }
+
+          //color.v = 0.8;//0.25 + (0.85 - 0.25) * (parent.childs[i].post.date - oldest.post.date) / (newest.post.date - oldest.post.date);
+          //color.s = 0.8;//(parent.childs[i].childs.length == 0 ? 0.5 : (parent.childs[i].childs.length < 20 ? 0.65 : 0.8));
+        }
+
+
+        var targ = sub(parent.childs[i], level + 1, color, [x, y]);
+        var grad = ctx.createLinearGradient(x, y, targ[0], targ[1]);
+        grad.addColorStop(0, HSVtoRGB(hsv).toString());
+        grad.addColorStop(1, HSVtoRGB(color).toString());
+        ctx.strokeStyle = grad;
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        //ctx.lineTo(targ[0], targ[1]);
+        ctx.bezierCurveTo(x, y + levelHeight(level + 1) * 0.4, targ[0], targ[1] - levelHeight(level + 1) * 0.4, targ[0], targ[1]);
+        ctx.stroke();
+      }
+      ctx.strokeStyle = HSVtoRGB(hsv.h, hsv.s, hsv.v - 0.3).toString(); //'#597DA3';
+      ctx.beginPath();
+      //ctx.moveTo(x, y - 2);
+      //ctx.lineTo(x, y + 2);
+      ctx.fillStyle = HSVtoRGB(hsv.h, hsv.s, hsv.v).toString();
+      ctx.arc(x, y, isFriend[parent.post.from_id] ? 2 : 0.5, 0, 360);
+      ctx.stroke();
+      if (isFriend[parent.post.from_id]) {
+        ctx.fill();
+      }
+      if (!levelDrawn[level]) {
+        levelDrawn[level] = true;
+        ctx.fillStyle = '#999';
+        ctx.textFont = '12px Lucida Grande, Arial, tahoma, verdana, sans-serif';
+        ctx.textAlign = 'left';
+        ctx.fillText(level, 1, y + 3);
+      }
+
+      offset[level] = (offset[level]|0) + 1;
+      return [x, y];
+    }
+    chunks = [];
+    sub(tree, 0, {h: 0, s: 0.6, v: 0.6});
+    ctx.textAlign = 'right';
+    ctx.fillText('ВСЕГО: ' + all, width - 2, 12);
+    ctx.fillText('УЧАСТНИКОВ: ' + unique, width - 2, 24);
+    drawHighlight(current ? cache[current] : false);
+  }
+
+  function HSVtoRGB(h, s, v) {
+    var r, g, b, i, f, p, q, t;
+    if (h && s === undefined && v === undefined) {
+        s = h.s, v = h.v, h = h.h;
+    }
+
+    i = Math.floor(h * 6);
+    f = h * 6 - i;
+    p = v * (1 - s);
+    q = v * (1 - f * s);
+    t = v * (1 - (1 - f) * s);
+    switch (i % 6) {
+        case 0: r = v, g = t, b = p; break;
+        case 1: r = q, g = v, b = p; break;
+        case 2: r = p, g = v, b = t; break;
+        case 3: r = p, g = q, b = v; break;
+        case 4: r = t, g = p, b = v; break;
+        case 5: r = v, g = p, b = q; break;
+    }
+    return {
+        r: Math.floor(r * 255),
+        g: Math.floor(g * 255),
+        b: Math.floor(b * 255),
+        toString: RGBtoString
+    };
+  }
+  function RGBtoString(rgb) {
+    rgb = rgb || this;
+    return '#' + ((rgb.r < 16) ? '0' : '') + rgb.r.toString(16) + ((rgb.g < 16) ? '0' : '') + rgb.g.toString(16) + ((rgb.b < 16) ? '0' : '') + rgb.b.toString(16);
+  }
+
+  function RNG(seed) {
+    // LCG using GCC's constants
+    this.m = 0x80000000; // 2**31;
+    this.a = 1103515245;
+    this.c = 12345;
+
+    this.state = seed ? seed : Math.floor(Math.random() * (this.m-1));
+  }
+  RNG.prototype.nextInt = function() {
+    this.state = (this.a * this.state + this.c) % this.m;
+    return this.state;
+  }
+  RNG.prototype.nextFloat = function() {
+    // returns in range [0,1]
+    return this.nextInt() / (this.m - 1);
+  }
+  RNG.prototype.nextRange = function(start, end) {
+    // returns in range [start, end): including start, excluding end
+    // can't modulu nextInt because of weak randomness in lower bits
+    var rangeSize = end - start;
+    var randomUnder1 = this.nextInt() / this.m;
+    return start + Math.floor(randomUnder1 * rangeSize);
+  }
+  RNG.prototype.choice = function(array) {
+    return array[this.nextRange(0, array.length)];
+  }
+
+  </script>
+</body>
 </html>

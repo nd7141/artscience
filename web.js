@@ -4,7 +4,7 @@ var app = express();
 
 app.use(express.logger());
 
-var htmlFile = './public/index.html';
+var htmlFile = './public/repost_tree.html';
 
 app.use(express.static(__dirname+'/public'));
 
